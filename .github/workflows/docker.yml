@@ -3,7 +3,7 @@ name: Dockerize
 on:
   push:
     branches:
-      - ci-dockerize
+      - master
 
 jobs:
   build:
@@ -27,5 +27,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/moin:github-actions
-
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/moin:latest
