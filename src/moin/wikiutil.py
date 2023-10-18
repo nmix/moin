@@ -4,6 +4,7 @@
 # Copyright: 2005-2010 MoinMoin:ThomasWaldmann
 # Copyright: 2007 MoinMoin:ReimarBauer
 # Copyright: 2008 MoinMoin:ChristopherDenter
+# Copyright: 2023 MoinMoin project
 # License: GNU GPL v2 (or any later version), see LICENSE.txt for details.
 
 """
@@ -14,7 +15,7 @@ import os
 
 from flask import current_app as app
 
-import werkzeug
+import urllib
 
 from moin.constants.contenttypes import CHARSET
 from moin.constants.misc import URI_SCHEMES, CLEAN_INPUT_TRANSLATION_MAP, ITEM_INVALID_CHARS_REGEX
@@ -191,12 +192,11 @@ def ParentItemName(itemname):
 #############################################################################
 
 def drawing2fname(drawing):
-    fname, ext = os.path.splitext(drawing)
+    _, ext = os.path.splitext(drawing)
     # note: do not just check for empty extension or stuff like drawing:foo.bar
-    # will fail, instead of being expanded to foo.bar.tdraw
+    # will fail, instead of being expanded to foo.bar.svgdraw
     if ext not in DRAWING_EXTENSIONS:
-        # for backwards compatibility, twikidraw is the default:
-        drawing += '.tdraw'
+        drawing += '.svgdraw'
     return drawing
 
 
@@ -246,7 +246,7 @@ def anchor_name_from_text(text):
     valid ID/name, it will return it without modification (identity
     transformation).
     """
-    quoted = werkzeug.urls.url_quote_plus(text, charset='utf-7', safe=':')
+    quoted = urllib.parse.quote_plus(text, safe=':', encoding='utf-7', )
     res = quoted.replace('%', '.').replace('+', '_')
     if not res[:1].isalpha():
         return 'A{0}'.format(res)

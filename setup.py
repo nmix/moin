@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # Copyright: 2001 by Juergen Hermann <jh@web.de>
 # Copyright: 2001-2018 MoinMoin:ThomasWaldmann
+# Copyright: 2023 MoinMoin project
 # License: GNU GPL v2 (or any later version), see LICENSE.txt for details.
 
 import os
@@ -65,29 +66,30 @@ setup_args = dict(
     include_package_data=True,
     zip_safe=False,
     use_scm_version={
-        'write_to': os.path.join(basedir, 'src', 'moin', '_version.py'),
+        'write_to': os.path.join('src', 'moin', '_version.py'),
     },
     setup_requires=[
         'setuptools_scm',  # magically cares for version and packaged files
     ],
     install_requires=[
         'Babel>=2.10.0',  # internationalization support
-        'blinker>=1.1',  # event signalling (e.g. for change notification trigger)
+        'blinker>=1.5',  # event signalling (e.g. for change notification trigger)
         'docutils>=0.18.1',  # reST markup processing
         'Markdown>=3.4.1',  # Markdown markup processing
+        'mdx_wikilink_plus>=1.4.1',  # Markdown Wikilinks extension
         'Flask<2.3.0',  # micro framework
-        'Flask-Babel<3.0.0',  # i18n support
+        'Flask-Babel>=3.0.0',  # i18n support
         'Flask-Caching>=1.2.0',  # caching support
-        'Flask-Theme>=0.3.5',  # theme support
+        'Flask-Theme>=0.3.6',  # theme support
         'emeraldtree>=0.10.0',  # xml processing
         'feedgen==0.9.*',  # Atom feed
         'flatland>=0.8',  # form handling
-        'Jinja2<3.1.0',  # template engine
+        'Jinja2>=3.1.0',  # template engine
         'markupsafe<=2.2.0',  # safe html and xml
         'pygments>=1.4',  # src code / text file highlighting
         'Werkzeug<2.4.0',  # wsgi toolkit
         'whoosh>=2.7.0',  # needed for indexed search
-        'pdfminer3',  # pdf -> text/plain conversion
+        'pdfminer.six',  # pdf -> text/plain conversion
         'passlib>=1.6.0',  # strong password hashing (1.6 needed for consteq)
         'setuptools>=51',  # dependency with setuptools_scm
         'sqlalchemy<2.0',  # used by sqla store
@@ -98,8 +100,6 @@ setup_args = dict(
         'XStatic-autosize',
         'XStatic-jQuery>=1.8.2',
         'XStatic-jQuery-File-Upload>=10.31.0',
-        'XStatic-TWikiDraw-moin>=2004.10.23.2',
-        'XStatic-AnyWikiDraw>=0.14.2',
         'XStatic-svg-edit-moin>=2012.11.15.1',
         'XStatic-JQuery.TableSorter>=2.14.5.1',
         'XStatic-Pygments>=1.6.0.1',

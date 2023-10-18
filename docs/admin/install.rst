@@ -195,7 +195,6 @@ Typing "./m" (or "m" on Windows) will display a menu similar to:
     new-wiki        create empty wiki
     sample          create wiki and load sample data
     restore *       create wiki and restore wiki/backup.moin *option, specify file
-    import19 <dir>  import a moin 1.9 wiki/data instance from <dir>
 
     run *           run built-in wiki server *options (--port 8081)
     backup *        roll 3 prior backups and create new backup *option, specify file
@@ -265,7 +264,6 @@ help by reporting bugs), then some logical menu choices are::
  ./m docs         # create docs, see User tab, Documentation (local)
  ./m del-wiki     # get rid of the sample data
  ./m new-wiki     # create empty wiki or
- ./m import19 ... # import moin 1.9 data
  ./m backup       # backup wiki data as needed or as scheduled
 
 If you installed moin2 by cloning the repository,
@@ -277,8 +275,11 @@ then you will likely want to keep your master branch up-to-date:
   git pull                 # if you cloned the moinwiki master repo OR
   git pull moinwiki master # if you cloned your fork and added a remote
 
-After pulling updates, it is best to also rerun the quickinstall process
-to install any changes or new releases of the dependent packages:
+Also check to see if there are changes to /src/moin/config/wikiconfig.py
+by comparing a diff to the wikiconfig.py in the wiki root.
+
+After pulling updates and updating wikiconfig.py, rerun the quickinstall
+process to install any new releases of dependent packages:
 
 ::
 
