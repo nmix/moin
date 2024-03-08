@@ -301,9 +301,9 @@ def convert_to_indexable(meta, data, item_name=None, is_new=False):
                 doc.set(moin_page.page_href, str(i))
                 refs_conv(doc)
                 # side effect: we update some metadata:
-                meta[ITEMLINKS] = refs_conv.get_links()
-                meta[ITEMTRANSCLUSIONS] = refs_conv.get_transclusions()
-                meta[EXTERNALLINKS] = refs_conv.get_external_links()
+                meta[ITEMLINKS] = sorted(refs_conv.get_links())
+                meta[ITEMTRANSCLUSIONS] = sorted(refs_conv.get_transclusions())
+                meta[EXTERNALLINKS] = sorted(refs_conv.get_external_links())
             doc = output_conv(doc)
             return doc
         # no way
@@ -1221,18 +1221,27 @@ class Item(PropertiesMixin):
             logging.warning("data validation skipped because metadata is invalid, see below")
             val = []
             for e in m.children:
-                logging.warning("{0}, {1}, {2}".format(e.valid, e.name, e.raw))
-                if e.valid is False:
+                if e.name == 'subscriptions':
+                    for sub in e.children:
+                        if sub.valid is False:
+                            val.append('"{}". {}'.format(str(sub), str(sub.errors[0])))
+                            e.valid = False
+                elif e.valid is False:
                     val.append(str(e))
+                logging.warning("{0}, {1}, {2}".format(e.valid, e.name, e.raw))
             if VALIDATION_HANDLING == VALIDATION_HANDLING_STRICT:
-                raise ValueError(_('Error: metadata validation failed, invalid field value(s) = {0}'.format(
+                raise ValueError(_('Error: metadata validation failed, invalid field value(s) = {0}').format(
                     ', '.join(val)
-                )))
+                ))
 
         # we do not have anything in m that is not defined in the schema,
         # e.g. userdefined meta keys or stuff we do not validate. thus, we
         # just update the meta dict with the validated stuff:
         meta.update(dict(m.value.items()))
+        if hasattr(flaskg, 'data_mtime'):
+            # this is maint-reduce-revisions OR item-put CL process, restore saved time of item's last update
+            meta[MTIME] = flaskg.data_mtime
+            del flaskg.data_mtime
         # we do not want None / empty values:
         # XXX do not kick out empty lists before fixing NAME processing:
         meta = dict([(k, v) for k, v in meta.items() if v not in [None, ]])

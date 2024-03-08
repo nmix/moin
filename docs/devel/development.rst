@@ -122,8 +122,7 @@ review configuration options
 ----------------------------
 
 * review https://moin-20.readthedocs.io/en/latest/admin/configure.html
-* following the instructions in wikiconfig.py, create wikiconfig_local.py and wikiconfig_editme.py
-* configure options by editing wikiconfig_editme.py
+* configure options by editing wikiconfig.py
 
   * set superuser privileges on at least one username
   * the default configuration options are commonly used, it is likely new bugs can be
@@ -499,8 +498,8 @@ Wiki admins can change permissions via the ACL rules.
 
 To load the help docs::
 
-    moin load-help --namespace common  # images common to all languages
-    moin load-help --namespace en      # English text
+    moin load-help --namespace help-common  # images common to all languages
+    moin load-help --namespace help-en      # English text
 
 Multiple languages may be loaded. Current languages include::
 
@@ -515,12 +514,12 @@ When editing is complete run one or more of::
     moin maint-reduce-revisions -q <item-name> -n help-en --test true # lists selected items, no updates
     moin maint-reduce-revisions -q <item-name> -n help-en  # updates selected items
 
-Dump all the help files::
+Dump all the English help files to the version controlled directory::
 
-    moin dump-help -n en
+    moin dump-help -n help-en
 
-The above command may update meta files even though the data files have not changed, see #1533.
-Commit only the target data and meta files. Revert the other meta files.
+The above command may may be useful after updating one or more files. All of the files
+will be rewritten but only the changed files will be highlighted in version control.
 
 Moin Shell
 ==========
@@ -574,7 +573,7 @@ Create a new venv, install moin, create instance, start server, create item, mod
     moin run  # empty wiki
     moin load-sample  # data but no index
     moin index-build   # data with index
-    moin load-help -n en # load English help
-    moin load-help -n common # load help images
+    moin load-help -n help-en # load English help
+    moin load-help -n help-common # load help images
 
 Announce update on #moin, moin-devel@python.org.

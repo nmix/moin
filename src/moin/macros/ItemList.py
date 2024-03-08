@@ -1,4 +1,5 @@
 # Copyright: 2019 MoinMoin:KentWatsen
+# Copyright: 2024 MoinMoin:UlrichB
 # License: GNU GPL v2 (or any later version), see LICENSE.txt for details.
 
 """
@@ -41,8 +42,7 @@ Parameters:
                         blocks of lowercase characters or numbers and an
                         uppercase character.
 
-            ItemTitle : Use the title from the first header in the linked
-                        item [*** NOT IMPLEMENTED YET ***]
+            ItemTitle : Use the title from the first header in the linked item
 
 Notes:
 
@@ -67,7 +67,7 @@ from flask import g as flaskg
 from moin.i18n import _
 from moin.utils.tree import moin_page
 from moin.utils.interwiki import split_fqname
-from moin.macros._base import MacroPageLinkListBase
+from moin.macros._base import MacroPageLinkListBase, get_item_names
 
 
 class Macro(MacroPageLinkListBase):
@@ -125,18 +125,18 @@ class Macro(MacroPageLinkListBase):
         # verify item exists and current user has read permission
         if item != "":
             if not flaskg.storage.get_item(**(split_fqname(item).query)):
-                message = _('Item does not exist or read access blocked by ACLs: {0}'.format(item))
+                message = _('Item does not exist or read access blocked by ACLs: {0}').format(item)
                 admonition = moin_page.div(attrib={moin_page.class_: 'important'},
                                            children=[moin_page.p(children=[message])])
                 return admonition
 
         # process subitems
-        children = self.get_item_names(item, startswith=startswith, skiptag=skiptag)
+        children = get_item_names(item, startswith=startswith, skiptag=skiptag)
         if regex:
             try:
                 regex_re = re.compile(regex, re.IGNORECASE)
             except re.error as err:
-                raise ValueError(_("ItemList macro: Error in regex {0!r}: {1}".format(regex, err)))
+                raise ValueError(_("ItemList macro: Error in regex {0!r}: {1}").format(regex, err))
             newlist = []
             for child in children:
                 if regex_re.search(child.fullname):
