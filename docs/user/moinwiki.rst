@@ -818,6 +818,9 @@ extra features. The following is a table of MoinMoin's macros.
 +-------------------------------------------+------------------------------------------------------------+
 | ``<<RandomItem(3)>>``                     | Inserts names of 3 random items                            |
 +-------------------------------------------+------------------------------------------------------------+
+| ``<<RandomQuote(Itemname)>>``             | Select a random quote from the given item,                 |
+|                                           | or from FortuneCookies if omitted.                         |
++-------------------------------------------+------------------------------------------------------------+
 | ``<<ShowIcons()>>``                       | Displays all icons in /static/img/icons directory          |
 +-------------------------------------------+------------------------------------------------------------+
 | ``<<ShowSmileys()>>``                     | Displays available smileys and the corresponding markup    |
@@ -825,6 +828,8 @@ extra features. The following is a table of MoinMoin's macros.
 | ``<<ShowUserGroup()>>``                   | Displays metadata defined in usergroup attribute           |
 +-------------------------------------------+------------------------------------------------------------+
 | ``<<ShowWikiDict()>>``                    | Displays metadata defined in wikidict attribute            |
++-------------------------------------------+------------------------------------------------------------+
+| ``<<SlideShow()>>``                       | Displays a link to start a slideshow for the current item  |
 +-------------------------------------------+------------------------------------------------------------+
 | ``<<TableOfContents(2)>>``                | Shows a table of contents up to level 2                    |
 +-------------------------------------------+------------------------------------------------------------+
@@ -880,6 +885,7 @@ The **ItemList** macro accepts multiple named parameters: item, startswith, rege
     - <<ItemList(ordered='True')>> displays ordered list of subitems, default is unordered
     - <<ItemList(startswith="Foo")>> lists subitems starting with Foo
     - <<ItemList(regex="Foo$")>> lists subitems ending with Foo
+    - <<ItemList(tag="template")>> only include items with this tag
     - <<ItemList(skiptag="template")>> ignore items with this tag
     - <<ItemList(display="FullPath")>> default, displays full path to subitems
     - <<ItemList(display="ChildPath")>> displays last component of the FullPath, including the '/'
@@ -895,6 +901,11 @@ fixed_height and anniversary.
     - <<MonthCalendar(item="SampleUser",month=12)>>  Calendar of Page SampleUser, this year's december
     - <<MonthCalendar(month=12)>>  Calendar of current Page, this year's december
     - <<MonthCalendar(year=2022,month=12)>>  Calendar of December, 2022
+
+The **SlideShow** macro creates a link to start a presentation for the current item. The slides
+are separated by level 1 and 2 headings. The text before the first heading is ignored. Navigation
+within the slideshow can be controlled via corresponding buttons at the edge or bottom of the
+browser screen or using the left and right arrow keys.
 
 
 Smileys and Icons

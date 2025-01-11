@@ -64,13 +64,13 @@ create your development environment
 * activate virtualenv::
 
     . activate  # Windows: activate
-* create a wiki instance and load sample data::
+* create a wiki instance and load help data and welcome pages::
 
-    ./m sample  # Windows: m sample
+    moin create-instance --full
 * start the built-in server::
 
-    ./m run  # Windows: m run
-* point your browser at http://127.0.0.1:8080/ to access your development wiki
+    moin run
+* point your browser at http://127.0.0.1:5000/ to access your development wiki
 * key ctrl+C to stop the built-in server
 
 add more tools, exercise tools
@@ -107,6 +107,7 @@ add more tools, exercise tools
 * create local docs::
 
     ./m docs  # Windows: m docs
+
 * set options on your favorite editor or IDE
 
   - convert tabs to 4 spaces
@@ -117,6 +118,29 @@ add more tools, exercise tools
   consider printing a cheatsheet
 * if you want a Python IDE, try https://www.jetbrains.com/pycharm/ Free Community Edition
 * join #moin-dev IRC channel; ask questions, learn what other developers are doing
+
+install pre-commit hooks
+------------------------
+Setup Black and Ruff pre-commit hooks::
+
+    pre-commit install  # pre-commit is used for code linting / auto-format
+
+Black and Ruff will inspect your changes as part of Git commit processing. If your code
+change violates Black's coding standards (a changed line of code is > 120 characters) Black will
+update the file and fail the commit. Your repo will have 2 versions of the offending file:
+the staged file with your changes and an unstaged version with Black's corrections.
+
+To fix, unstage the file to merge your channges into Black's version, then restage the
+file and rerun commit.
+
+If Ruff finds an error, it will create an error message and fail the commit. In this case,
+unstage the offending file, fix the error, restage the file and rerun commit.
+
+Note that these same checks are made as part of GitHub push-merge processing.
+If there is an error the merge will fail. Fix the error, restage the file, and commit.
+
+Read more about Black at https://black.readthedocs.io/en/stable/index.html.
+Read more about Ruff at https://github.com/astral-sh/ruff?tab=readme-ov-file#ruff.
 
 review configuration options
 ----------------------------
@@ -530,31 +554,33 @@ there may be an occasional need to access the moin shell directly::
     source <path-to-venv>/bin/activate  # or ". activate"  windows: "activate"
     moin -h                             # show help
 
-Package Release on test.pypi.org
-================================
 
-This procedure for updating test.pypi avoids adding release tags to master branch,
-hoping that someday there will be a real 2.0.0a1. Current state
-of moin 2 is pre-alpha.
 
-Commit or stash all versioned changes. Pull all updates from master repo. Create a release branch.
-Run `./m quickinstall` to update the venv and translations. Run tests.
-Add a tag with the next release number to the release branch::
 
-    git tag 2.0.0a14
 
-Install or upgrade release tools::
+Package Release on pypi.org and Github Releases
+===============================================
+
+* Commit or stash all versioned changes.
+* Pull all updates from master repo.
+* Run `./m quickinstall` to update the venv and translations.
+* Run tests.
+* Add a signed, annotated tag with the next release number to master branch::
+
+    git tag -s 2.0.0a1 -m "alpha release"
+
+* Install or upgrade release tools::
 
     pip install --upgrade setuptools wheel
     pip install --upgrade twine
     pip install --upgrade build
 
-Build the distribution and upload to test.pypi.org::
+* Build the distribution and upload to pypi.org::
 
     py -m build > build.log 2>&1  # check build.log for errors
-    py -m twine upload --repository testpypi dist/*
+    py -m twine upload dist/*
 
-Enter ID and password as requested.
+* Enter ID and password or API Token as requested.
 
 Test Build
 ----------
@@ -563,17 +589,50 @@ Create a new venv, install moin, create instance, start server, create item, mod
 
     <python> -m venv </path/to/new/virtual/environment>
     cd </path/to/new/virtual/environment>
-    source bin/activate  # scripts\activate
-    pip install --upgrade pip  # next command fails with pip 9.0.1 and maybe later versions
-    pip install --pre --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple moin
+    source bin/activate  # or "scripts\activate" on windows
+    pip install --pre moin
+    moin --help  # prove it works
+    # update wikiconfig.py  # default allows read-only, admins may load data
     moin create-instance --path <path/to/new/wikiconfig/dir>  # path optional, defaults to CWD
     cd <path/to/new/wikiconfig/dir>  # skip if using default CWD
     moin index-create
-    moin --help  # prove it works
-    moin run  # empty wiki
-    moin load-sample  # data but no index
-    moin index-build   # data with index
+
+    moin run  # empty wiki, or do
+    moin welcome  # load welcome pages (e.g. Home)
     moin load-help -n help-en # load English help
     moin load-help -n help-common # load help images
+    moin run  # wiki with English help and welcome pages
 
-Announce update on #moin, moin-devel@python.org.
+Continue with Package Release
+-----------------------------
+
+Push the signed, annotated tag created above to github master::
+
+    git push moinwiki 2.0.0a1
+
+Create an ASCII-format detached signature named moin-2.0.0a1.tar.gz.asc::
+
+    cd dist
+    gpg --detach-sign -a moin-2.0.0a1.tar.gz
+    cd ..
+
+Follow the instructions here to update GitHub; drag & drop moin-2.0.0a1.tar.gz
+and moin-2.0.0a1.tar.gz.asc to upload files area. These files serve as
+a backup for the release sdist and the signature, so anybody can
+verify the sdist is authentic::
+
+    https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository
+
+Test the GitHub Release package::
+
+    <python> -m venv </path/to/new/virtual/environment>
+    cd </path/to/new/virtual/environment>
+    source bin/activate  # or "scripts\activate" on windows
+    pip install git+https://github.com/moinwiki/moin@2.0.0a1
+    moin --help  # prove it works
+
+Announce update on #moin, moin-devel@python.org, moin-user@python.org::
+
+    Moinmoin 2.0.0a1 has been released on https://pypi.org/project/moin/#history
+    and https://github.com/moinwiki/moin/releases. See https://moin-20.readthedocs.io/en/latest/,
+    use https://github.com/moinwiki/moin/issues to report bugs.

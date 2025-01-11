@@ -58,21 +58,21 @@ Shown below are parts of the directory structure after cloning moin and running 
 The default uses the OS file system for storage of wiki data and indexes.
 The directories and files shown are referenced in this section of documentation related to configuration::
 
-    moin/                         # clone root, default name
-        contrib/                  # scripts and docs of interest to developers
-        docs/                     # moin documentation in restructured text (.rst) format
+    moin/                     # clone root, default name
+        contrib/              # scripts and docs of interest to developers
+        docs/                 # moin documentation in restructured text (.rst) format
             _build/
-                html/             # local copy of moin documentation, created by running "./m docs" command
-        requirements.d/           # package requirements used by quickinstall.py
-        scripts/                  # misc. scripts of interest to developers
+                html/         # local copy of moin documentation, created by running "./m docs" command
+        requirements.d/       # package requirements used by quickinstall.py
+        scripts/              # misc. scripts of interest to developers
         src/
-            moin/                 # large directory containing moin application code
-        wiki/                     # the wiki instance; created by running "./m sample" or "./m new-wiki" commands
-            data/                 # wiki data and metadata
-            index/                # wiki indexes
-        wiki_local/               # a convenient location to store custom CSS, Javascript, templates, logos, etc.
-        wikiconfig.py             # main configuration file, modify this to add or change features
-        intermap.txt              # interwiki map: copied by quickinstall.py, updated by "./m interwiki"
+            moin/             # large directory containing moin application code
+        wiki/                 # the wiki instance; created by running "./m new-wiki" or "moin create-instance" commands
+            data/             # wiki data and metadata
+            index/            # wiki indexes
+        wiki_local/           # a convenient location to store custom CSS, Javascript, templates, logos, etc.
+        wikiconfig.py         # main configuration file, modify this to add or change features
+        intermap.txt          # interwiki map: copied by quickinstall.py, updated by "./m interwiki"
 
 After installing moin from pypi or unpacking using a package manager, the directory structure will
 look like this::
@@ -259,7 +259,7 @@ macros to show something else::
     {{ sep }}
     {{ credit('https://moinmo.in/GPL', 'GPL licensed', 'MoinMoin is GPL licensed.') }}
     {{ sep }}
-    {{ credit('https://validator.w3.org/check?uri=referer', 'Valid HTML 5', 'Click here to validate this page.') }}
+    {{ credit('https://validator.w3.org/check?uri=referer', 'Valid HTML5', 'Click here to validate this page.') }}
     {{ end }}
     {% endmacro %}
 
@@ -328,7 +328,7 @@ Here is the source code segment from snippets.html::
 
     {# Header/Sidebar for topside_cms theme - see docs for tips on customization #}
     {% macro cms_header() %}
-        <header id="moin-header">
+        <header id="moin-header" lang="{{ theme_supp.user_lang }}" dir="{{ theme_supp.user_dir }}">
             {% block header %}
 
                 {% if logo() %}
@@ -564,7 +564,8 @@ username (like with german umlauts or accented characters). If moin does not
 crash (log a Unicode Error), you have likely found the correct coding.
 
 For users configuring GivenAuth on Apache, an example virtual host configuration
-file is included with MoinMoin in `docs/examples/deployment/moin-http-basic-auth.conf`.
+is included at `contrib/deployment/moin-http-basic-auth.conf`
+
 
 LDAPAuth
 --------
@@ -669,41 +670,6 @@ Example logging output::
 **Note:** there is sensitive information like usernames and passwords in this
 log output. Make sure you only use this for testing only and delete the logs when
 done.
-
-SMBMount
---------
-SMBMount is no real authenticator in the sense that it authenticates (logs in)
-or deauthenticates (logs out) users. It instead catches the username and password
-and uses them to mount a SMB share as this user.
-
-SMBMount is only useful for very special applications, e.g. in combination
-with the fileserver storage backend::
-
-    from moin.auth.smb_mount import SMBMount
-
-    smbmounter = SMBMount(
-        # you may remove default values if you are happy with them
-        # see man mount.cifs for details
-        server='smb.example.org',  # (no default) mount.cifs //server/share
-        share='FILESHARE',  # (no default) mount.cifs //server/share
-        mountpoint_fn=lambda username: '/mnt/wiki/%s' % username,  # (no default) function of username to determine the mountpoint
-        dir_user='www-data',  # (no default) username to get the uid that is used for mount.cifs -o uid=...
-        domain='DOMAIN',  # (no default) mount.cifs -o domain=...
-        dir_mode='0700',  # (default) mount.cifs -o dir_mode=...
-        file_mode='0600',  # (default) mount.cifs -o file_mode=...
-        iocharset='utf-8',  # (default) mount.cifs -o iocharset=... (try 'iso8859-1' if default does not work)
-        coding='utf-8',  # (default) encoding used for username/password/cmdline (try 'iso8859-1' if default does not work)
-        log='/dev/null',  # (default) logfile for mount.cifs output
-    )
-
-    auth = [....., smbmounter]  # you need a real auth object in the list before smbmounter
-
-    smb_display_prefix = "S:"  # where //server/share is usually mounted for your windows users (display purposes only)
-
-.. todo::
-
-   check if SMBMount still works as documented
-
 
 Transmission security
 =====================
@@ -1380,7 +1346,6 @@ Features:
     - with 1 revision
     - with as much metadata as can be made up from the filesystem metadata
   + directories will show up as index items, listing links to their contents
-* might be useful together with SMBMount pseudo-authenticator
 
 .. _namespaces:
 
@@ -1398,11 +1363,11 @@ To configure custom namespaces, find the section in wikiconfig.py that looks sim
         NAMESPACE_USERS: 'users',
         NAMESPACE_USERPROFILES: 'userprofiles',
         # namespaces for editor help files are optional, if unwanted delete here and in backends and acls
-        'help-common': 'help-common',  # contains media files used by other language helps
-        'help-en': 'help-en',  # replace this with help-de, help-ru, help-pt_BR etc.
-        # define custom namespaces if desired, trailing / below causes foo to be stored in default backend
-        # 'foo/': 'default',
-        # custom namespace with a separate backend - note absence of trailing /
+        NAMESPACE_HELP_COMMON: 'help-common',  # contains media files used by other language helps
+        NAMESPACE_HELP_EN: 'help-en',  # replace this with help-de, help-ru, help-pt_BR etc.
+        # define custom namespaces using the default backend
+        # 'foo': 'default',
+        # custom namespace with a separate backend (a wiki/data/bar directory will be created)
         # 'bar': 'bar',
     }
     backends = {
@@ -1517,7 +1482,7 @@ the following::
     email_tracebacks = True
 
 
-Please also check the logging configuration example in `docs/examples/config/logging/email`.
+Please also check the logging configuration example in `contrib/logging/email`.
 
 User E-Mail Address Verification
 --------------------------------
@@ -1570,13 +1535,13 @@ https://docs.python.org/3/library/logging.config.html#configuration-file-format
 
 
 There are also some logging configurations in the
-`docs/examples/config/logging/` directory.
+`contrib/logging/` directory.
 
 Logging configuration needs to be done very early, usually it will be done
 from your adaptor script, e.g. moin.wsgi::
 
     from moin import log
-    log.load_config('wiki/config/logging/logfile')
+    log.load_config('contrib/logging/logfile')
 
 You have to fix that path to use a logging configuration matching your
 needs (use an absolute path).
